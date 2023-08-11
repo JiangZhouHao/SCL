@@ -97,7 +97,14 @@ class CoLA(nn.Module):
         k_hard = num_segments // self.r_hard
 
 
+        embeddings, cas, actionness = self.actionness_module(x)
 
+        actionness_before1 = torch.roll(actionness, shifts=-1, dims=1)
+        actionness_after1 = torch.roll(actionness,shifts=1,dims=1)
+        actionness_before2 = torch.roll(actionness,shifts=-2,dims=1)
+        actionness_after2 = torch.roll(actionness,shifts=2,dims=1)
+        actionness = actionness + 0.1*actionness_before1 + 0.1*actionness_after1 + 0.02 * actionness_before2 + 0.02*actionness_after2
+        
         easy_act, easy_bkg = self.easy_snippets_mining(actionness, embeddings, k_easy)
         hard_act, hard_bkg = self.hard_snippets_mining(actionness, embeddings, k_hard)
 
